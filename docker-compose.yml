@@ -1,0 +1,8 @@
+version: '3'
+
+services:
+  simple_ruby:
+    build: .
+    container_name: simple_ruby
+    volumes:
+      - .:/app
