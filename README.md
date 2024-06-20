@@ -1,31 +1,50 @@
 # SimpleRuby
 
-TODO: Delete this and the text below, and describe your gem
+A simple Ruby application using docker.
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/simple_ruby`. To experiment with that code, run `bin/console` for an interactive prompt.
+## Docker configuration
+Set the docker-compose file:
+```yml
+version: '3'
 
-## Installation
+services:
+  simple_ruby:
+    build: .
+    container_name: simple_ruby
+    volumes:
+      - .:/app
 
-TODO: Replace `UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG` with your gem name right after releasing it to RubyGems.org. Please do not do it earlier due to security reasons. Alternatively, replace this section with instructions to install your gem from git if you don't plan to release to RubyGems.org.
+```
 
-Install the gem and add to the application's Gemfile by executing:
+Set the Dockerfile:
+```yml
 
-    $ bundle add UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG
+# Use the official Ruby image from Docker Hub.
+FROM ruby:3.3.1
 
-If bundler is not being used to manage dependencies, install the gem by executing:
+# Set the working directory inside the container.
+WORKDIR /app
 
-    $ gem install UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG
+# Copy the Gemfile and Gemfile.lock into the container.
+COPY Gemfile* simple_ruby.gemspec ./
 
-## Usage
+# Copy the version file into the container.
+COPY lib/simple_ruby/version.rb ./lib/simple_ruby/version.rb
 
-TODO: Write usage instructions here
+# Install dependencies using Bundler.
+RUN bundle install
 
-## Development
+# Copy the rest of the application code into the container.
+COPY . .
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+# Keeps the container available.
+CMD ["tail", "-f", "/dev/null"]
+```
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+## Running the application
 
-## Contributing
+Run:  
+`docker-compose up --build`
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/simple_ruby.
+Get inside the container and execute the commands normally:  
+`docker exec -it simple_ruby bash`
